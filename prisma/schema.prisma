@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CollegeType {
+  GOVERNMENT
+  PRIVATE
+  DEEMED
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String?
+  email          String         @unique
+  password       String
+  createdAt      DateTime       @default(now())
+
+  reviews        Review[]
+  savedColleges  SavedCollege[]
+}
+
+model College {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  location      String
+  state         String
+  fees          Int
+  rating        Float
+  imageUrl      String?
+  description   String?
+  type          CollegeType
+  createdAt     DateTime      @default(now())
+
+  courses       Course[]
+  placements    Placement[]
+  reviews       Review[]
+  savedBy       SavedCollege[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  duration    String
+  fees        Int
+
+  collegeId   String
+  college     College  @relation(fields: [collegeId], references: [id])
+}
+
+model Placement {
+  id              String   @id @default(cuid())
+  year            Int
+  avgPackage      Float
+  highestPackage  Float
+
+  collegeId       String
+  college         College  @relation(fields: [collegeId], references: [id])
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  rating      Float
+  comment     String
+  createdAt   DateTime  @default(now())
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+
+  collegeId   String
+  college     College   @relation(fields: [collegeId], references: [id])
+}
+
+model SavedCollege {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+
+  userId      String
+  collegeId   String
+
+  user        User      @relation(fields: [userId], references: [id])
+  college     College   @relation(fields: [collegeId], references: [id])
+
+  @@unique([userId, collegeId])
+}
