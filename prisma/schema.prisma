@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum CollegeType {
@@ -13,76 +14,76 @@ enum CollegeType {
 }
 
 model User {
-  id             String         @id @default(cuid())
-  name           String?
-  email          String         @unique
-  password       String
-  createdAt      DateTime       @default(now())
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
 
-  reviews        Review[]
-  savedColleges  SavedCollege[]
+  reviews       Review[]
+  savedColleges SavedCollege[]
 }
 
 model College {
-  id            String        @id @default(cuid())
-  name          String        @unique
-  location      String
-  state         String
-  fees          Int
-  rating        Float
-  imageUrl      String?
-  description   String?
-  type          CollegeType
-  createdAt     DateTime      @default(now())
+  id          String        @id @default(cuid())
+  name        String        @unique
+  location    String
+  state       String
+  fees        Int
+  rating      Float
+  imageUrl    String?
+  description String?
+  type        CollegeType
+  createdAt   DateTime      @default(now())
 
-  courses       Course[]
-  placements    Placement[]
-  reviews       Review[]
-  savedBy       SavedCollege[]
+  courses     Course[]
+  placements  Placement[]
+  reviews     Review[]
+  savedBy     SavedCollege[]
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  name        String
-  duration    String
-  fees        Int
+  id        String   @id @default(cuid())
+  name      String
+  duration  String
+  fees      Int
 
-  collegeId   String
-  college     College  @relation(fields: [collegeId], references: [id])
+  collegeId String
+  college   College  @relation(fields: [collegeId], references: [id])
 }
 
 model Placement {
-  id              String   @id @default(cuid())
-  year            Int
-  avgPackage      Float
-  highestPackage  Float
+  id             String   @id @default(cuid())
+  year           Int
+  avgPackage     Float
+  highestPackage Float
 
-  collegeId       String
-  college         College  @relation(fields: [collegeId], references: [id])
+  collegeId      String
+  college        College @relation(fields: [collegeId], references: [id])
 }
 
 model Review {
-  id          String    @id @default(cuid())
-  rating      Float
-  comment     String
-  createdAt   DateTime  @default(now())
+  id        String   @id @default(cuid())
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
-  collegeId   String
-  college     College   @relation(fields: [collegeId], references: [id])
+  collegeId String
+  college   College  @relation(fields: [collegeId], references: [id])
 }
 
 model SavedCollege {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
 
-  userId      String
-  collegeId   String
+  userId    String
+  collegeId String
 
-  user        User      @relation(fields: [userId], references: [id])
-  college     College   @relation(fields: [collegeId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  college   College  @relation(fields: [collegeId], references: [id])
 
   @@unique([userId, collegeId])
 }
