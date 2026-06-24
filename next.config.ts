@@ -1,3 +1,7 @@
+if (process.env.VERCEL === "1") {
+  delete process.env.NEXTAUTH_URL;
+}
+
 const sanitizeEnvVar = (key: string) => {
   const value = process.env[key];
   if (!value) {
@@ -16,7 +20,6 @@ const sanitizeEnvVar = (key: string) => {
 };
 
 sanitizeEnvVar("DATABASE_URL");
-sanitizeEnvVar("NEXTAUTH_URL");
 sanitizeEnvVar("NEXTAUTH_SECRET");
 
 if (process.env.VERCEL_URL && !process.env.NEXTAUTH_URL) {

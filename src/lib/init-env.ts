@@ -1,6 +1,11 @@
-// Helper to clean up env variables (trim whitespace and strip accidentally pasted quotes)
-// If the variable is empty or invalid, we delete it from process.env to prevent Node.js
-// from coercing 'undefined' into the literal string "undefined".
+// Clean up environment variables to prevent build crashes.
+// On Vercel, we delete NEXTAUTH_URL to let next-auth automatically fall back to VERCEL_URL.
+// This prevents "TypeError: Invalid URL" errors caused by invalid or static NEXTAUTH_URL
+// variables defined in the Vercel dashboard.
+if (process.env.VERCEL === "1") {
+  delete process.env.NEXTAUTH_URL;
+}
+
 const sanitizeEnvVar = (key: string) => {
   const value = process.env[key];
   if (!value) {
@@ -19,10 +24,9 @@ const sanitizeEnvVar = (key: string) => {
 };
 
 sanitizeEnvVar("DATABASE_URL");
-sanitizeEnvVar("NEXTAUTH_URL");
 sanitizeEnvVar("NEXTAUTH_SECRET");
 
-// Fallback NEXTAUTH_URL setup for Vercel
+// Ensure VERCEL_URL is fallback for any other logic
 if (process.env.VERCEL_URL && !process.env.NEXTAUTH_URL) {
   process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
 }
