@@ -1,21 +1,23 @@
-const cleanEnvVar = (value: string | undefined): string | undefined => {
-  if (!value) return undefined;
+const sanitizeEnvVar = (key: string) => {
+  const value = process.env[key];
+  if (!value) {
+    delete process.env[key];
+    return;
+  }
   let clean = value.trim();
   if ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1);
+    clean = clean.slice(1, -1).trim();
   }
-  return clean.trim();
+  if (!clean || clean === "undefined") {
+    delete process.env[key];
+  } else {
+    process.env[key] = clean;
+  }
 };
 
-if (process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = cleanEnvVar(process.env.DATABASE_URL);
-}
-if (process.env.NEXTAUTH_URL) {
-  process.env.NEXTAUTH_URL = cleanEnvVar(process.env.NEXTAUTH_URL);
-}
-if (process.env.NEXTAUTH_SECRET) {
-  process.env.NEXTAUTH_SECRET = cleanEnvVar(process.env.NEXTAUTH_SECRET);
-}
+sanitizeEnvVar("DATABASE_URL");
+sanitizeEnvVar("NEXTAUTH_URL");
+sanitizeEnvVar("NEXTAUTH_SECRET");
 
 if (process.env.VERCEL_URL && !process.env.NEXTAUTH_URL) {
   process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
